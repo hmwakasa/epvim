@@ -1,0 +1,21 @@
+\frametitle{コマンドラインモードでのコマンド}	\begin{center}
+		\begin{tabular}{cl}
+			コマンド&意味\\
+			\hline
+			:e filename&filename を編集\\
+			:w&上書き保存\\
+			:help&ヘルプを表示\\
+			:sp :vsp&画面を分割表示\\
+			:tabnew&タブページを利用\\
+			:!cmd&外部コマンド cmd を使用\\
+			:r!cmd&cmd の結果を挿入
+		\end{tabular}
+	\end{center}
+	
+	.vimrc で自前のコマンドを定義できる
+	
+	\begin{lstlisting}
+" :pLaTeX で、編集しているファイルを platex で処理する
+" % は編集しているファイル名に展開される :r で拡張子を取り除く
+command pLaTeX !ptex2pdf %:r
+	\end{lstlisting}

@@ -1,0 +1,399 @@
+%! LuaLaTeX 文書
+\documentclass[unicode,aspectratio=1610,colorlinks,handout]{beamer}
+\usetheme[numbering=fraction,block=fill]{metropolis}
+\usefonttheme{professionalfonts}
+
+\hypersetup{linkcolor=,urlcolor=teal}
+
+\usepackage{luatexja}
+\ltjsetparameter{jacharrange={-2,-3,-8}}
+\usepackage[no-math,match,deluxe]{luatexja-preset}
+
+\usepackage{textcomp}
+\usepackage{luatexja-otf}
+
+\usepackage{graphicx,xcolor}
+\usepackage{pxrubrica}
+\usepackage{tcolorbox}
+\usepackage{bxwareki}
+\usepackage{indentfirst}
+
+\usepackage{listings}
+\lstset{
+	doubleletterspace,
+	basicstyle={\small\ttfamily},
+	backgroundcolor={\color[gray]{.9}},
+	commentstyle={\color[gray]{.5}},
+	numbers=left,
+	numberstyle=\tiny,
+}
+
+\usepackage{tikz}
+\usetikzlibrary{plotmarks}
+
+\usepackage{scsnowman} %☃
+\usepackage{bxokumacro}
+\usepackage{menukeys}
+\renewmenumacro{\keys}[+]{shadowedroundedkeys}
+\usepackage{bxrawstr} % https://zrbabbler.hatenablog.com/entry/20181222/1545495849
+\usepackage[twemoji-pdf]{bxcoloremoji} % https://github.com/zr-tex8r/BXcoloremoji
+
+\usepackage{mflogo}
+
+\usepackage{bxtexlogo}
+\bxtexlogoimport{*,**}
+
+\usepackage[T1]{fontenc}
+\usepackage{mathtools,amssymb,mathrsfs,mathabx}
+\usepackage[math]{iwona}
+\usepackage[euler-digits]{eulervm}
+\allowdisplaybreaks[4]
+
+%%%%%%%%%% 商用フォントを用いているので、自分でタイプセットする場合は適当に以下を変えてください
+\setmainfont[
+	Ligatures=TeX,
+	BoldFont=FOT-RodinNTLGPro-EB,
+	ItalicFont=FOT-RodinNTLGPro-EB,
+]{FOT-RodinNTLGPro-B}
+\setsansfont[
+	Ligatures=TeX,
+	BoldFont=FOT-RodinNTLGPro-EB,
+	ItalicFont=FOT-RodinNTLGPro-EB,
+]{FOT-RodinNTLGPro-B}
+\setmainjfont[
+	Ligatures=TeX,
+	CharacterWidth=Proportional,
+	JFM=prop,
+	BoldFont=FOT-RodinNTLGPro-EB,
+	ItalicFont=FOT-RodinNTLGPro-EB,
+]{FOT-RodinNTLGPro-B}
+\setsansjfont[
+	Ligatures=TeX,
+	CharacterWidth=Proportional,
+	JFM=prop,
+	BoldFont=FOT-RodinNTLGPro-EB,
+	ItalicFont=FOT-RodinNTLGPro-EB,
+]{FOT-RodinNTLGPro-B}
+\setmonofont[
+	Ligatures=TeXReset,
+]{HackGen}
+\setmonojfont[
+	Ligatures=TeXReset,
+]{HackGen}
+
+\newfontfamily\errorfont[
+	Ligatures=TeX,
+]{TsukuQMinLStd-L}
+
+\newfontfamily\nishikifonta[
+	Ligatures=TeX,
+]{Nishiki-teki}
+\newjfontfamily\nishikifontj[
+	Ligatures=TeX,
+]{Nishiki-teki}
+\newcommand{\nishikifont}{\nishikifonta\nishikifontj}
+
+%%%%%%%%%% 以下は自前コマンド
+
+\newcommand{\centeralign}[1]{\rule{0pt}{0pt}\hfill#1\hfill\rule{0pt}{0pt}}
+\newcommand{\typecommand}[1]{\colorbox{darkgray}{{\ttfamily\color{lime}#1}}}
+\newtcolorbox{hmcommandbox}{
+		sharp corners,left=0mm,right=0mm,top=0mm,bottom=0mm,
+		colframe=darkgray,
+		colback=darkgray,
+		fontupper=\ttfamily,
+		colupper=lime,
+}
+
+\setlength{\parskip}{2ex}
+
+\title{便利に使う Vim 入門}
+\author{北海道大学理学院 宇宙理学専攻 M1 人見祥磨}
+\date{\warekitoday}
+
+\begin{document}
+\rubyusejghost % \jruby で和文ゴースト
+
+\frame{\maketitle}
+
+\begin{frame}
+	\section{Vim とは何か}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Vim とは}
+	\begin{itemize}
+		\item \textbf{V}i \textbf{im}proved
+		\item テキストエディタ vi を拡張したもの
+		\item 現在では、vi で vim（の機能を制限したもの）が起動することが多い
+			\begin{hmcommandbox}
+				\% vi --version\\
+				VIM - Vi IMproved 8.1 {\scriptsize 以下略}
+			\end{hmcommandbox}
+	\end{itemize}
+	
+	\begin{block}{テキストエディタとは}
+		テキストファイルを編集するためのソフトウェア
+		\begin{description}
+			\item[スクリーンエディタ] テキストファイルの中身を画面に表示しながら、
+				カーソルを移動させてテキストを編集するもの
+			\item[ラインエディタ] テキストファイルの中身を表示\emph{せず}、行単位
+				でコマンドを利用しながら編集するもの
+		\end{description}
+		
+		vi は ラインエディタ ex の流れを汲む
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Vim の使い方}
+	\begin{block}{Vim を使いこなすのに参考になるもの}
+		\begin{description}
+			\item[\typecommand{vimtutor}] Vim を一切知らない人が、一通りの機能を扱える
+				様になるための公式チュートリアル
+			\item[ヘルプファイル] 正確で詳しい情報が載っている
+		\end{description}
+	\end{block}
+	
+	\begin{block}{ヘルプファイルの表示方法}
+		Vim ノーマルモードで、\typecommand{:help <調べたいもの>} と打ち込むことで表示できる
+		
+		日本語のヘルプファイルを導入するにはひと手間必要
+		
+		\url{https://vim-jp.org/vimdoc-ja/index.html} からも日本語ドキュメントを参照できる
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Vim のモード}
+	Vim は複数のモードを持つ
+	
+	複数のモードを行き来してテキストの編集を行う
+	
+	\begin{center}
+		\begin{tikzpicture}[x=.6\textwidth,y=.2\textwidth,>=stealth]
+			\node(N)at(0,0){ノーマルモード};
+			\node(I)at(1,0){挿入モード};
+			\node(V)at(0,-1){ヴィジュアルモード};
+			\node(C)at(1,-1){コマンドラインモード};
+			\draw[->](N)--(I)node[midway,above]{i, a, I, A, O, o など};
+			\draw[->](N)--(V)node[midway,left]{v, V など};
+			\draw[->](N)--(C)node[midway,above right]{:};
+		\end{tikzpicture}
+	\end{center}
+	
+	Esc キーでノーマルモードに戻る
+\end{frame}
+
+\begin{frame}
+	\frametitle{それぞれのモードの役割}
+	\begin{tabular}{ll}
+		ノーマルモード&カーソル移動、ヤンク、貼り付け、削除などをするモード\\
+		挿入モード&文字入力などをするモード\\
+		ビジュアルモード&範囲を選択するモード\\
+		コマンドラインモード&コマンドを実行するモード
+	\end{tabular}
+	
+	\begin{block}{Ex モード}
+		Ex モードというモードもある（ノーマルモードで Q で移行）
+		
+		コマンドを複数続けて実行するモード
+		
+		<Esc> ではノーマルモードに戻れない
+		
+		:visual でノーマルモードに戻る
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\section{Vim の設定}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Vim の設定ファイル}
+	Vim の設定はコマンドラインモードで行うことができる
+	
+	例: \typecommand{:syntax on} でカラーリングをオンにできる
+	
+	よく使う設定を毎回設定するのは面倒
+	
+	\textasciitilde/.vimrc ファイルにコマンドを書き込んでおくと、Vim 起動時に読み込んでくれる
+	
+	\begin{block}{defaults.vim}
+		vimrc ファイルが存在しない場合に読み込まれるもの
+		
+		新規の Vim ユーザーにとって使いやすい設定がまとめられている
+		
+		コマンドラインモードでのタブ補完や、マウスの利用設定などがある
+		
+		defaults.vim の詳細は \typecommand{:help defaults.vim-explained}
+	\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{.vimrc の例}
+	\begin{lstlisting}
+" から始まる行はコメント
+" defaults.vim を確実に読み込ませる
+unlet! skip_defaults_vim
+
+" defaults.vim を読み込む
+source $VIMRUNTIME/defaults.vim
+
+" 日本語のヘルプファイルが利用できるときは利用する
+set helplang=ja,en
+
+"Tab を明示的に表示する。（\ のあとにはスペース）
+set list
+set listchars=tab:^\ 
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+	\section{ノーマルモードでの操作}
+\end{frame}
+
+\begin{frame}
+	\frametitle{モード間の移動}
+	\begin{center}
+		\begin{tabular}{cll}
+			コマンド&意味&移行するモード\\
+			\hline
+			a&カーソルの後ろに文字を追加 (append)&挿入モード\\
+			A&行の後ろに文字を追加&挿入モード\\
+			i&カーソルの前に文字を挿入 (insert)&挿入モード\\
+			I&行の先頭に文字を挿入&挿入モード\\
+			o&カーソルの次の行に新しい行を追加 (open?)&挿入モード\\
+			O&カーソル位置に新しい行を追加&挿入モード\\
+			s&カーソル位置の文字を削除して挿入モード&挿入モード\\
+			S&行を削除して挿入モード&挿入モード\\
+			v&文字単位のヴィジュアルモード&ヴィジュアルモード\\
+			V&行単位のヴィジュアルモード&ヴィジュアルモード\\
+			C-v&矩形ヴィジュアルモード&ヴィジュアルモード\\
+			r&カーソル位置の文字を 1 文字置き換え (replace)&置換モード\\
+			R&カーソル下の文字をどんどん置き換えるモード&置換モード\\
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{モーション}
+	カーソルを移動させるコマンド
+	
+	範囲を表すこともできる（後述）
+	
+	数字と組み合わせて繰り返し回数を指定できる\\
+	i.e. 2w → 2 単語移動
+	
+	\begin{center}
+		\begin{tabular}{cl}
+			コマンド&意味\\
+			\hline
+			h j k l&← ↓ ↑ →\\
+			w e b&単語単位の移動 (word, end, back)\\
+			\$ \textasciicircum&行末・行頭へ移動\\
+			G gg&ファイル先頭・末尾へ移動\\
+			\%&対応するカッコへ移動
+		\end{tabular}
+	\end{center}
+	
+	その他の移動コマンドは \typecommand{:help quickref}
+\end{frame}
+
+\begin{frame}
+	\frametitle{オペレーター}
+	\begin{center}
+		\begin{tabular}{cl}
+			コマンド&意味\\
+			\hline
+			y&ヤンク (yank) （コピー）\\
+			d&削除 (delete)\\
+			c&削除して挿入モードに移行 (change)
+		\end{tabular}
+	\end{center}
+	
+	オペレーターは範囲を表すコマンドと組み合わせる\\
+	i.e. c\$ → 行末まで削除して挿入モードに移行
+	
+	\begin{block}{テキストオブジェクト}
+		a（ひとつの ``a'' まとまり）または i (inner) と組み合わせて範囲を指定する
+		\begin{center}
+			\begin{tabular}{cl}
+				コマンド&意味\\
+				\hline
+				iw&カーソルがある単語\\
+				a( a)&( ) を含めた全体
+			\end{tabular}
+		\end{center}
+		
+		ci\{ とすれば \{ \} の中身を削除して挿入モードに移行
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{その他のコマンド}
+	\begin{center}
+		\begin{tabular}{cl}
+			コマンド&意味\\
+			\hline
+			D&行末まで削除 (d\$)\\
+			C&行末まで削除して挿入モードに移行 (c\$)\\
+			dd&1 行削除\\
+			yy&1 行ヤンク\\
+			p&カーソルの後ろに貼り付け\\
+			P&カーソルの手前に貼り付け\\
+			x&1 文字削除\\
+			J&行を連結\\
+			u&アンドゥ\\
+			C-r&リドゥ\\
+			.&繰り返し\\
+			ZZ&変更を保存して終了（変更がなければ何もしない）(:x)\\
+			ZQ&何もせず終了 (:q!)
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\section{ヴィジュアルモード}
+\end{frame}
+
+\begin{frame}
+	\frametitle{ヴィジュアルモードとは}
+	範囲を選択するモード
+	
+	範囲を選択したあとに c d y などを組み合わせる
+	
+	矩形ヴィジュアルモード (C-v) では、複数行への挿入 (I) や編集もできる
+	
+	> や < でインデントを増減することができる
+\end{frame}
+
+\begin{frame}
+	\section{コマンドラインモード}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{コマンドラインモードでのコマンド}
+	\begin{center}
+		\begin{tabular}{cl}
+			コマンド&意味\\
+			\hline
+			:e filename&filename を編集\\
+			:w&上書き保存\\
+			:help&ヘルプを表示\\
+			:sp :vsp&画面を分割表示\\
+			:tabnew&タブページを利用\\
+			:!cmd&外部コマンド cmd を使用\\
+			:r!cmd&cmd の結果を挿入
+		\end{tabular}
+	\end{center}
+	
+	.vimrc で自前のコマンドを定義できる
+	
+	\begin{lstlisting}
+" :pLaTeX で、編集しているファイルを platex で処理する
+" % は編集しているファイル名に展開される :r で拡張子を取り除く
+command pLaTeX !ptex2pdf %:r
+	\end{lstlisting}
+\end{frame}
+\end{document}
